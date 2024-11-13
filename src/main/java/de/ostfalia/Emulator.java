@@ -12,21 +12,16 @@ public class Emulator {
         this.cpu = new CPU();
     }
 
-    // Methode zum Laden des Programms in den Speicher
     public void loadProgram(byte[] program, int startAddress) {
 
-        int counter = startAddress;
+        Loader loader = new Loader();
 
-        for (byte val : program) {
-            memory.write(counter, val);
-            counter++;
-        }
+        loader.writeProgram(program, startAddress);
 
         this.cpu.setIc(startAddress);
     }
 
-    // Haupt-Emulationsschleife
     public void run() {
-        cpu.executeInstruction();
+        cpu.startup();
     }
 }

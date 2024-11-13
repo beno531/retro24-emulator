@@ -17,11 +17,11 @@ public class Memory {
     }
 
     public int read(int address) {
-        return ram[address] & 0xFF;
+        return ram[address] & 0xFFFF;
     }
 
     public void write(int address, int value) {
-        ram[address] = (byte) (value & 0xFF);
+        ram[address] = (byte) (value & 0xFFFF);
     }
 
     public void reset() {

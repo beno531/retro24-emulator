@@ -13,15 +13,12 @@ public class OpcodeMap {
 
     private void initialize(CPU cpu) {
 
-        opcodes.put(0xA9, cpu::ldaImmediate); // Opcode für LDA #immediate
-
-
-        opcodes.put(0x00, cpu::ldaImmediate); // NUL ($00, 1-Byte-OP): Prozessor tut nichts
-        opcodes.put(0x01, cpu::ldaImmediate); // MAR ($01, 3-Byte-OP): Lädt AR mit den nächsten beiden Bytes.
-        opcodes.put(0x02, cpu::ldaImmediate); // SIC ($02, 1-Byte-OP): Speichert IC an die im AR angegebene Adresse.
+       /* opcodes.put(0x00, cpu::nul); // NUL ($00, 1-Byte-OP): Prozessor tut nichts
+        opcodes.put(0x01, cpu::mar); // MAR ($01, 3-Byte-OP): Lädt AR mit den nächsten beiden Bytes.
+        opcodes.put(0x02, cpu::sic); // SIC ($02, 1-Byte-OP): Speichert IC an die im AR angegebene Adresse.
         opcodes.put(0x03, cpu::ldaImmediate); // RAR ($03, 1-Byte-OP): R1/R2 werden ins AR kopiert.
         opcodes.put(0x04, cpu::ldaImmediate); // AAR ($04, 1-Byte-OP): Addiert R0 aufs AR, bei Überlauf geht Übertrag verloren.
-        opcodes.put(0x05, cpu::ldaImmediate); // IR0 ($05, 1-Byte-OP): Erhöht den Wert von R0 um 1, allerdings nicht über $FF hinaus.
+        opcodes.put(0x05, cpu::ir0); // IR0 ($05, 1-Byte-OP): Erhöht den Wert von R0 um 1, allerdings nicht über $FF hinaus.
         opcodes.put(0x06, cpu::ldaImmediate); // A01 ($06, 1-Byte-OP): Addiert R0 auf R1. Bei Überlauf wird R2 um 1 erhöht. Läuft dabei wiederum R2 über, werden R1 und R2 zu $FF.
         opcodes.put(0x07, cpu::ldaImmediate); // DR0 ($07, 1-Byte-OP): Erniedrigt den Wert von R0 um 1, allerdings nicht unter $00.
         opcodes.put(0x08, cpu::ldaImmediate); // S01 ($08, 1-Byte-OP): Subtrahiert R0 von R1. Falls eine negative Zahl entsteht, enthält R1 dann den Betrag der negativen Zahl. Ferner wird dann R2 um 1 erniedrigt. Tritt dabei ein Unterlauf von R2 auf, werden R1 und R2 zu $00.
@@ -53,6 +50,8 @@ public class OpcodeMap {
         opcodes.put(0x2C, cpu::ldaImmediate); // PL0 ($2C, 1-Byte-OP): Schiebt die Bits in R0 um ein Bit nach „links“ (entspricht Teilen durch 2 ohne Rest)
         opcodes.put(0x2D, cpu::ldaImmediate); // PR0 ($2D, 1-Byte-OP): Schiebt die Bits in R0 um ein Bit nach „rechts“ (entspricht Multiplikation mit 2 ohne Übertrag).
         opcodes.put(0xFF, cpu::ldaImmediate); // HLT ($FF, 1-Byte-OP): Prozessor hält an
+
+        */
     }
 
     public Runnable getInstruction(int opcode) {

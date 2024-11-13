@@ -9,13 +9,12 @@ public class Main {
         Emulator emulator = new Emulator();
 
         byte[] program = {
-                (byte) 0xA9, 0x01, // LDA #$01
-                (byte) 0xAA,       // TAX
-                (byte) 0xE8,       // INX
-                (byte) 0x00        // BRK (Abbruch)
+                (byte) 0x01, 0x34, 0x12,
+                (byte) 0x01, 0x78, 0x56,
+                (byte) 0xDD
         };
 
-        emulator.loadProgram(program, 0x600);
+        emulator.loadProgram(program, 0x0004);
         emulator.run();
     }
 }

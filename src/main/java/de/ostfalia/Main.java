@@ -9,9 +9,8 @@ public class Main {
         Emulator emulator = new Emulator();
 
         byte[] program = {
-                (byte) 0x01, 0x34, 0x12,
-                (byte) 0x01, 0x78, 0x56,
-                (byte) 0xDD
+                (byte) 0x02,
+                (byte) 0xDD // TODO
         };
 
         emulator.loadProgram(program, 0x0004);

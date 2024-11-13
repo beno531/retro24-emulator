@@ -3,6 +3,7 @@ package de.ostfalia;
 import java.util.HashMap;
 import java.util.Map;
 public class CPU {
+
     // Register
     private int ar = 0x0000;  // Address Register
     private int ic = 0x0000;  // Instruction Counter
@@ -63,6 +64,9 @@ public class CPU {
     public void startup() {
 
         while(true){
+
+            debugOut();
+
             int opcode = memory.read(ic);
 
             //Runnable instruction = opcodeMap.getInstruction(opcode);
@@ -70,8 +74,6 @@ public class CPU {
 
             if (instruction != null) {
                 instruction.run();
-
-                debugOut();
             } else {
                 break;
                 //throw new IllegalStateException("Unbekannter Opcode: " + opcode);
@@ -84,8 +86,8 @@ public class CPU {
 
         System.out.printf("----------------------------------------- \n");
 
-        System.out.printf("Address Register: 0x%04X%n", this.ar);
-        System.out.printf("Instruction Counter: 0x%04X%n", this.ic);
+        System.out.printf("AR: 0x%04X%n", this.ar);
+        System.out.printf("IC: 0x%04X%n", this.ic);
 
         System.out.printf("R0: 0x%02X%n", this.r0);
         System.out.printf("R1: 0x%02X%n", this.r1);
@@ -111,6 +113,38 @@ public class CPU {
         this.ar = ar;
     }
 
+    public int getR0() {
+        return r0;
+    }
+
+    public void setR0(int r0) {
+        this.r0 = r0;
+    }
+
+    public int getR1() {
+        return r1;
+    }
+
+    public void setR1(int r1) {
+        this.r1 = r1;
+    }
+
+    public int getR2() {
+        return r2;
+    }
+
+    public void setR2(int r2) {
+        this.r2 = r2;
+    }
+
+    public int getR3() {
+        return r3;
+    }
+
+    public void setR3(int r3) {
+        this.r3 = r3;
+    }
+
     // --- Instructions ---
 
     public void ldaImmediate() {
@@ -119,33 +153,56 @@ public class CPU {
 
     // Prozessor tut nichts
     private void nul(){
-
+        ++ic;
     }
 
     // Lädt AR mit den nächsten beiden Bytes.
     private void mar(){
         // little endian
-        this.ar = ((memory.read(this.ic + 2) & 0xFF) << 8) | (memory.read(this.ic + 1) & 0xFF);
-
-        this.ic += 0x0003;
+        ar = ((memory.read(ic + 2) & 0xFF) << 8) | (memory.read(ic + 1) & 0xFF);
+        ic += 3;
     }
 
+    // Speichert IC an die im AR angegebene Adresse.
     private void sic(){
-
+        byte lowByte = (byte) (ic & 0xFF);
+        byte highByte = (byte) ((ic >> 8) & 0xFF);
+        memory.write(ar, lowByte);
+        memory.write(++ar, highByte);
+        ic += 1;
     }
 
+    // R1/R2 werden ins AR kopiert.
     private void rar(){
-
+        ar = ((r2 & 0xFF) << 8) | (r1 & 0xFF);
+        ++ic;
     }
 
+    // Addiert R0 aufs AR, bei Überlauf geht Übertrag verloren.
     private void aar(){
-
+        int result = ar + r0;
+        if(result > 0xFFFF){
+            ar = 0xFFFF;
+        }
+        else {
+            ar = result;
+        }
+        ++ic;
     }
 
+    // Erhöht den Wert von R0 um 1, allerdings nicht über $FF hinaus.
     private void ir0() {
-        this.r0 = (this.r0 + 1) & 0xFF;
+        int result = ++r0;
+        if(result > 0xFF){
+            r0 = 0xFF;
+        }
+        else {
+            r0 = result;
+        }
+        ++ic;
     }
 
+    // Addiert R0 auf R1. Bei Überlauf wird R2 um 1 erhöht. Läuft dabei wiederum R2 über, werden R1 und R2 zu $FF.
     private void a01(){
 
     }

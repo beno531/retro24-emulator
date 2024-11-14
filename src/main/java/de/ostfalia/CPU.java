@@ -13,15 +13,11 @@ public class CPU {
     private int r3 = 0x00;
 
     private Memory memory;
-
-    //private OpcodeMap opcodeMap;
     private Map<Integer, Runnable> opcodeMap = new HashMap<>();
 
     public CPU() {
         this.memory = Memory.getInstance();
 
-
-        //this.opcodeMap = new OpcodeMap(this);
         opcodeMap.put(0x00, this::nul); // NUL ($00, 1-Byte-OP): Prozessor tut nichts
         opcodeMap.put(0x01, this::mar); // MAR ($01, 3-Byte-OP): Lädt AR mit den nächsten beiden Bytes.
         opcodeMap.put(0x02, this::sic); // SIC ($02, 1-Byte-OP): Speichert IC an die im AR angegebene Adresse.
@@ -34,25 +30,29 @@ public class CPU {
         opcodeMap.put(0x09, this::x12); // X12 ($09, 1-Byte-OP): Vertauscht die Inhalte von R1 und R2.
         opcodeMap.put(0x10, this::x01); // X01 ($10, 1-Byte-OP): Vertauscht die Inhalte von R0 und R1.
 
-        opcodeMap.put(0x11, this::ldaImmediate); // JMP ($11, 1-Byte-OP): Springt zu der in AR angegebenen Adresse.
-        opcodeMap.put(0x12, this::ldaImmediate); // SR0 ($12, 1-Byte-OP): Speichert R0 an die in AR angegebene Adresse.
-        opcodeMap.put(0x13, this::ldaImmediate); // SRW ($13, 1-Byte-OP): Speichert R1 an die in AR angegebene Adresse, ferner R2 an die Adresse dahinter.
-        opcodeMap.put(0x14, this::ldaImmediate); // LR0 ($14, 1-Byte-OP): Lädt R0 aus der in AR angegebenen Adresse.
-        opcodeMap.put(0x15, this::ldaImmediate); // LRW ($15, 1-Byte-OP): Lädt R1 aus der in AR angegebenen Adresse, ferner R2 aus der Adresse dahinter.
-        opcodeMap.put(0x16, this::ldaImmediate); // TAW ($16, 1-Byte-OP): AR wird nach R1/R2 kopiert.
-        opcodeMap.put(0x17, this::ldaImmediate); // MR0 ($17, 2-Byte-OP): Das nachfolgende Byte wird nach R0 geschrieben.
-        opcodeMap.put(0x18, this::ldaImmediate); // MRW ($18, 3-Byte-OP): Die nachfolgenden 2 Bytes werden nach R1 und R2 geschrieben.
-        opcodeMap.put(0x19, this::ldaImmediate); // JZ0 ($19, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R0=$00 ist.
-        opcodeMap.put(0x20, this::ldaImmediate); // JGW ($20, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R1 > R2 ist.
-        opcodeMap.put(0x21, this::ldaImmediate); // JEW ($21, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R1=R2 ist.
-        opcodeMap.put(0x22, this::ldaImmediate); // OR0 ($22, 2-Byte-OP): Speichert in R0 das logische ODER aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
-        opcodeMap.put(0x23, this::ldaImmediate); // AN0 ($23, 2-Byte-OP): Speichert in R0 das logische UND aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
-        opcodeMap.put(0x24, this::ldaImmediate); // JE0 ($24, 2-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R0 gleich dem nachfolgenden Byte ist.
-        opcodeMap.put(0x25, this::ldaImmediate); // C01 ($25, 1-Byte-OP): Kopiert R0 nach R1.
-        opcodeMap.put(0x26, this::ldaImmediate); // C02 ($26, 1-Byte-OP): Kopiert R0 nach R2.
+
+        opcodeMap.put(0x11, this::jmp); // JMP ($11, 1-Byte-OP): Springt zu der in AR angegebenen Adresse.
+        opcodeMap.put(0x12, this::sr0); // SR0 ($12, 1-Byte-OP): Speichert R0 an die in AR angegebene Adresse.
+        opcodeMap.put(0x13, this::srw); // SRW ($13, 1-Byte-OP): Speichert R1 an die in AR angegebene Adresse, ferner R2 an die Adresse dahinter.
+        opcodeMap.put(0x14, this::lr0); // LR0 ($14, 1-Byte-OP): Lädt R0 aus der in AR angegebenen Adresse.
+        opcodeMap.put(0x15, this::lrw); // LRW ($15, 1-Byte-OP): Lädt R1 aus der in AR angegebenen Adresse, ferner R2 aus der Adresse dahinter.
+        opcodeMap.put(0x16, this::taw); // TAW ($16, 1-Byte-OP): AR wird nach R1/R2 kopiert.
+
+        opcodeMap.put(0x17, this::mr0); // MR0 ($17, 2-Byte-OP): Das nachfolgende Byte wird nach R0 geschrieben.
+        opcodeMap.put(0x18, this::mrw); // MRW ($18, 3-Byte-OP): Die nachfolgenden 2 Bytes werden nach R1 und R2 geschrieben.
+        opcodeMap.put(0x19, this::jz0); // JZ0 ($19, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R0=$00 ist.
+        opcodeMap.put(0x20, this::jgw); // JGW ($20, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R1 > R2 ist.
+        opcodeMap.put(0x21, this::jew); // JEW ($21, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R1=R2 ist.
+        opcodeMap.put(0x22, this::or0); // OR0 ($22, 2-Byte-OP): Speichert in R0 das logische ODER aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
+        opcodeMap.put(0x23, this::an0); // AN0 ($23, 2-Byte-OP): Speichert in R0 das logische UND aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
+        opcodeMap.put(0x24, this::je0); // JE0 ($24, 2-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R0 gleich dem nachfolgenden Byte ist.
+        opcodeMap.put(0x25, this::c01); // C01 ($25, 1-Byte-OP): Kopiert R0 nach R1.
+        opcodeMap.put(0x26, this::c02); // C02 ($26, 1-Byte-OP): Kopiert R0 nach R2.
+
         opcodeMap.put(0x27, this::ldaImmediate); // IRW ($27, 1-Byte-OP): Erhöht den Wert von R1 um 1. Bei Überlauf wird R2 um 1 erhöht. Läuft dabei wiederum R2 über, werden R1 und R2 zu $FF.
         opcodeMap.put(0x28, this::ldaImmediate); // DRW ($28, 1-Byte-OP): Erniedrigt den Wert von R1 um 1. Falls eine negative Zahl entsteht, enthält R1 dann den Betrag der negativen Zahl. Ferner wird dann R2 um 1 erniedrigt. Tritt dabei ein Unterlauf von R2 auf, werden R1 und R2 zu $00.
         opcodeMap.put(0x29, this::ldaImmediate); // X03 ($29, 1-Byte-OP): Vertauscht die Inhalte von R0 und R3.
+
 
         opcodeMap.put(0x2A, this::ldaImmediate); // C03 ($2A, 1-Byte-OP): Kopiert R0 nach R3.
         opcodeMap.put(0x2B, this::ldaImmediate); // C30 ($2B, 1-Byte-OP): Kopiert R3 nach R0.
@@ -69,7 +69,6 @@ public class CPU {
 
             int opcode = memory.read(ic);
 
-            //Runnable instruction = opcodeMap.getInstruction(opcode);
             Runnable instruction = opcodeMap.get(opcode);
 
             if (instruction != null) {
@@ -168,7 +167,7 @@ public class CPU {
         byte lowByte = (byte) (ic & 0xFF);
         byte highByte = (byte) ((ic >> 8) & 0xFF);
         memory.write(ar, lowByte);
-        memory.write(++ar, highByte);
+        memory.write(ar + 1, highByte); // TODO: Wird AR auch erhöht? Woher weiß ich, dass aufgeteilt wurde?
         ic += 1;
     }
 
@@ -180,48 +179,167 @@ public class CPU {
 
     // Addiert R0 aufs AR, bei Überlauf geht Übertrag verloren.
     private void aar(){
-        int result = ar + r0;
-        if(result > 0xFFFF){
-            ar = 0xFFFF;
-        }
-        else {
-            ar = result;
-        }
+        ar = Math.min(ar + r0, 0xFFFF);
         ++ic;
     }
 
     // Erhöht den Wert von R0 um 1, allerdings nicht über $FF hinaus.
     private void ir0() {
-        int result = ++r0;
-        if(result > 0xFF){
-            r0 = 0xFF;
-        }
-        else {
-            r0 = result;
-        }
+        r0 = Math.min(++r0, 0xFF);
         ++ic;
     }
 
     // Addiert R0 auf R1. Bei Überlauf wird R2 um 1 erhöht. Läuft dabei wiederum R2 über, werden R1 und R2 zu $FF.
     private void a01(){
-
+        int x = r1 + r0;
+        if(x > 0xFF){
+            r1 = 0xFF;
+            r2 = Math.min(++r2, 0xFF);
+        }
+        else {
+            r1 = x;
+        }
+        ++ic;
     }
 
+    // Erniedrigt den Wert von R0 um 1, allerdings nicht unter $00.
     private void dr0(){
-
+        r0 = Math.max(--r0, 0x00);
+        ++ic;
     }
 
+    // Subtrahiert R0 von R1. Falls eine negative Zahl entsteht, enthält R1 dann den Betrag der negativen Zahl. Ferner wird dann R2 um 1 erniedrigt. Tritt dabei ein Unterlauf von R2 auf, werden R1 und R2 zu $00.
     private void s01(){
+        int x = (byte) r1 - (byte) r0;
 
+        if (x < 0) {
+            r1 = Math.abs(x);
+
+            --r2;
+            if (r2 < 0) {
+                r1 = 0x00;
+                r2 = 0x00;
+            }
+        } else {
+            r1 = x;
+        }
+        ++ic;
     }
 
+    // Vertauscht die Inhalte von R1 und R2.
     private void x12(){
-
+        int temp = r1;
+        r1 = r2;
+        r2 = temp;
+        ++ic;
     }
 
+    // Vertauscht die Inhalte von R0 und R1.
     private void x01(){
-
+        int temp = r0;
+        r0 = r1;
+        r1 = temp;
+        ++ic;
     }
 
+    // Springt zu der in AR angegebenen Adresse.
+    private void jmp(){
+        ic = memory.read(ar);
+    }
+
+    // Speichert R0 an die in AR angegebene Adresse.
+    private void sr0(){
+        memory.write(ar, r0);
+        ++ic;
+    }
+
+    // Speichert R1 an die in AR angegebene Adresse, ferner R2 an die Adresse dahinter.
+    private void srw(){
+        memory.write(ar, r1);
+        memory.write(ar + 1, r2); // TODO: AR Überlauf?
+        ++ic;
+    }
+
+    // Lädt R0 aus der in AR angegebenen Adresse.
+    private void lr0(){
+        r0 = memory.read(ar);
+        ++ic;
+    }
+
+    // Lädt R1 aus der in AR angegebenen Adresse, ferner R2 aus der Adresse dahinter.
+    private void lrw(){
+        r1 = memory.read(ar);
+        r2 = memory.read(ar + 1);
+        ++ic;
+    }
+
+    // AR wird nach R1/R2 kopiert.
+    private void taw(){
+        byte lowByte = (byte) (ar & 0xFF);
+        byte highByte = (byte) ((ar >> 8) & 0xFF);
+        r1 = lowByte;
+        r2 = highByte;
+        ++ic;
+    }
+
+    // Das nachfolgende Byte wird nach R0 geschrieben.
+    private void mr0(){
+
+        ic += 2;
+    }
+
+    // Die nachfolgenden 2 Bytes werden nach R1 und R2 geschrieben.
+    private void mrw(){
+
+        ic += 3;
+    }
+
+    // Springt zu der in AR angegebenen Adresse, falls R0=$00 ist.
+    private void jz0(){
+
+        ++ic;
+    }
+
+    // Springt zu der in AR angegebenen Adresse, falls R1 > R2 ist.
+    private void jgw(){
+
+        ++ic;
+    }
+
+    // Springt zu der in AR angegebenen Adresse, falls R1=R2 ist.
+    private void jew(){
+
+        ++ic;
+    }
+
+    // Speichert in R0 das logische ODER aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
+    private void or0(){
+
+        ic += 2;
+    }
+
+    // Speichert in R0 das logische UND aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
+    private void an0(){
+
+        ic += 2;
+    }
+
+    // Springt zu der in AR angegebenen Adresse, falls R0 gleich dem nachfolgenden Byte ist.
+    private void je0(){
+
+        ic += 2;
+    }
+
+    // Kopiert R0 nach R1.
+    private void c01(){
+
+        ++ic;
+    }
+
+    // Kopiert R0 nach R2.
+    private void c02(){
+
+        ++ic;
+    }
 
 }

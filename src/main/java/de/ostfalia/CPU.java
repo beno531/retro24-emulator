@@ -244,7 +244,7 @@ public class CPU {
 
     // Springt zu der in AR angegebenen Adresse.
     private void jmp(){
-        ic = memory.read(ar);
+        ic = memory.read(ar); // TODO: Test nochmal anschauen
     }
 
     // Speichert R0 an die in AR angegebene Adresse.
@@ -284,60 +284,126 @@ public class CPU {
 
     // Das nachfolgende Byte wird nach R0 geschrieben.
     private void mr0(){
-
+        r0 = memory.read(ic + 1);
         ic += 2;
     }
 
     // Die nachfolgenden 2 Bytes werden nach R1 und R2 geschrieben.
     private void mrw(){
-
+        r1 = memory.read(ic + 1);
+        r2 = memory.read(ic + 2);
         ic += 3;
     }
 
     // Springt zu der in AR angegebenen Adresse, falls R0=$00 ist.
     private void jz0(){
-
-        ++ic;
+        if(r0 == 0x00){
+            ic = memory.read(ar);
+        }
+        else {
+            ++ic;
+        }
     }
 
     // Springt zu der in AR angegebenen Adresse, falls R1 > R2 ist.
     private void jgw(){
-
-        ++ic;
+        if(r1 > r2){
+            ic = memory.read(ar);
+        }
+        else {
+            ++ic;
+        }
     }
 
     // Springt zu der in AR angegebenen Adresse, falls R1=R2 ist.
     private void jew(){
-
-        ++ic;
+        if(r1 == r2){
+            ic = memory.read(ar);
+        }
+        else {
+            ++ic;
+        }
     }
 
     // Speichert in R0 das logische ODER aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
     private void or0(){
-
+        r0 = r0 | memory.read(ic + 1);
         ic += 2;
     }
 
     // Speichert in R0 das logische UND aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
     private void an0(){
-
+        r0 = r0 & memory.read(ic + 1);
         ic += 2;
     }
 
     // Springt zu der in AR angegebenen Adresse, falls R0 gleich dem nachfolgenden Byte ist.
     private void je0(){
 
-        ic += 2;
+        if(r0 == memory.read(ic + 1)){
+            ic = memory.read(ar);
+        }
+        else {
+            ic += 2;
+        }
     }
 
     // Kopiert R0 nach R1.
     private void c01(){
-
-        ++ic;
+        r1 = r0;
+        ++ic;   // TODO: "Schreibt nach" überprüfen, ob wert zurückgesetzt wird
     }
 
     // Kopiert R0 nach R2.
     private void c02(){
+        r2 = r0;
+        ++ic; // TODO: "Schreibt nach" überprüfen, ob wert zurückgesetzt wird
+    }
+
+    // Erhöht den Wert von R1 um 1. Bei Überlauf wird R2 um 1 erhöht. Läuft dabei wiederum R2 über, werden R1 und R2 zu $FF.
+    private void irw(){
+
+        ++ic;
+    }
+
+    // Erniedrigt den Wert von R1 um 1. Falls eine negative Zahl entsteht, enthält R1 dann den Betrag der negativen Zahl. Ferner wird dann R2 um 1 erniedrigt. Tritt dabei ein Unterlauf von R2 auf, werden R1 und R2 zu $00.
+    private void drw(){
+
+        ++ic;
+    }
+
+    // Vertauscht die Inhalte von R0 und R3.
+    private void x03(){
+
+        ++ic;
+    }
+
+    // Kopiert R0 nach R3.
+    private void c03(){
+
+        ++ic;
+    }
+
+    // Kopiert R3 nach R0.
+    private void c30(){
+
+        ++ic;
+    }
+
+    // Schiebt die Bits in R0 um ein Bit nach „links“ (entspricht Teilen durch 2 ohne Rest)
+    private void pl0(){
+
+        ++ic;
+    }
+
+    // Schiebt die Bits in R0 um ein Bit nach „rechts“ (entspricht Multiplikation mit 2 ohne Übertrag).
+    private void pr0(){
+
+        ++ic;
+    }
+
+    // Prozessor hält an
+    private void hlt(){
 
         ++ic;
     }

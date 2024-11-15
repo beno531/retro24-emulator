@@ -570,4 +570,416 @@ class EmulatorTest {
 
         Assertions.assertTrue(0x34 == cpu.getR1() && 0x12 == cpu.getR2());
     }
+
+    @Test
+    void testMR0() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x17, (byte) 0x99,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x99, cpu.getR0());
+    }
+
+    @Test
+    void testMRW() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x18, (byte) 0x11, (byte) 0x22,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.startup();
+
+        Assertions.assertTrue(0x11 == cpu.getR1() && 0x22 == cpu.getR2());
+    }
+
+    // R0 != 0x00
+    @Test
+    void testJZ0_1() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x19,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR0(0x01);
+        cpu.setAr(0x8888);
+        memory.write(0x8888, 0XEE);
+        memory.write(0x00EE, 0XDD);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x0101, cpu.getIc());
+    }
+
+    // R0 == 0x00
+    @Test
+    void testJZ0_2() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x19
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR0(0x00);
+        cpu.setAr(0x8888);
+        memory.write(0x8888, 0XEE);
+        memory.write(0x00EE, 0XDD); // TODO
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x00EE, cpu.getIc());
+    }
+
+    // R1 < R2
+    @Test
+    void testJGW_1() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x20,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR1(0x01);
+        cpu.setR2(0x02);
+        cpu.setAr(0x8888);
+        memory.write(0x8888, 0XEE);
+        memory.write(0x00EE, 0XDD);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x0101, cpu.getIc());
+    }
+
+    // R1 == R2
+    @Test
+    void testJGW_2() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x20,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR1(0x01);
+        cpu.setR2(0x01);
+        cpu.setAr(0x8888);
+        memory.write(0x8888, 0XEE);
+        memory.write(0x00EE, 0XDD);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x0101, cpu.getIc());
+    }
+
+    // R1 > R2
+    @Test
+    void testJGW_3() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x20
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR1(0x02);
+        cpu.setR2(0x01);
+        cpu.setAr(0x8888);
+        memory.write(0x8888, 0XEE);
+        memory.write(0x00EE, 0XDD); // TODO
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x00EE, cpu.getIc());
+    }
+
+    // R1 < R2
+    @Test
+    void testJEW_1() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x21,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR1(0x01);
+        cpu.setR2(0x02);
+        cpu.setAr(0x8888);
+        memory.write(0x8888, 0XEE);
+        memory.write(0x00EE, 0XDD);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x0101, cpu.getIc());
+    }
+
+    // R1 > R2
+    @Test
+    void testJEW_2() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x21,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR1(0x02);
+        cpu.setR2(0x01);
+        cpu.setAr(0x8888);
+        memory.write(0x8888, 0XEE);
+        memory.write(0x00EE, 0XDD);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x0101, cpu.getIc());
+    }
+
+    // R1 == R2
+    @Test
+    void testJEW_3() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x21
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR1(0x02);
+        cpu.setR2(0x02);
+        cpu.setAr(0x8888);
+        memory.write(0x8888, 0XEE);
+        memory.write(0x00EE, 0XDD); // TODO
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x00EE, cpu.getIc());
+    }
+
+    @Test
+    void testOR0() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x22, 0x11,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR0(0x22);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x33, cpu.getR0());
+    }
+
+    @Test
+    void testAN0() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x23, 0x09,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR0(0x33);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x01, cpu.getR0());
+    }
+
+    // R0 gleich dem nachfolgenden Byte
+    @Test
+    void testJE0_1() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x24, 0x11,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR0(0x11);
+        cpu.setAr(0x0011);
+        memory.write(0x0011, 0XEE);
+        memory.write(0x00EE, 0XDD); // TODO
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x00EE, cpu.getIc());
+    }
+
+    // R0 ungleich dem nachfolgenden Byte
+    @Test
+    void testJE0_2() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x24, 0x11,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR0(0x12);
+        memory.write(0x0011, 0XEE);
+        memory.write(0x00EE, 0XDD); // TODO
+
+        cpu.startup();
+
+        Assertions.assertEquals(0x0102, cpu.getIc());
+    }
+
+    // R0 ungleich dem nachfolgenden Byte
+    @Test
+    void testC01() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x25,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR0(0xAA);
+        cpu.setR1(0x00);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0xAA, cpu.getR1());
+    }
+
+    // R0 ungleich dem nachfolgenden Byte
+    @Test
+    void testC02() {
+
+        int startAddress = 0x0100;
+
+        CPU cpu = new CPU();
+        Loader loader = new Loader();
+
+        byte[] program = {
+                (byte) 0x26,
+                (byte) 0xDD // TODO
+        };
+
+        loader.writeProgram(program, startAddress);
+        cpu.setIc(startAddress);
+
+        cpu.setR0(0xAA);
+        cpu.setR2(0x00);
+
+        cpu.startup();
+
+        Assertions.assertEquals(0xAA, cpu.getR2());
+    }
+
+
 }

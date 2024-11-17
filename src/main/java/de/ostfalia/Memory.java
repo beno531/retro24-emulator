@@ -17,11 +17,11 @@ public class Memory {
     }
 
     public int read(int address) {
-        return ram[address] & 0xFF;
+        return Byte.toUnsignedInt(ram[address]);
     }
 
-    public void write(int address, int value) {
-        ram[address] = (byte) (value & 0xFF);
+    public void write(int address, byte value) {
+        ram[address] = value;
     }
 
     public void reset() {

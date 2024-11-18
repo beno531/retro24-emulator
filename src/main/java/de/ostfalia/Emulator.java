@@ -9,9 +9,14 @@ public class Emulator {
     private Loader loader;
 
     public Emulator(){
-        this.memory = Memory.getInstance();
+        //this.memory = Memory.getInstance();
+        this.memory = new Memory();
+
         this.cpu = new CPU();
+        cpu.connectMemory(memory);
+
         loader = new Loader();
+        loader.connectMemory(memory);
     }
 
     public void loadProgram(int[] program) {

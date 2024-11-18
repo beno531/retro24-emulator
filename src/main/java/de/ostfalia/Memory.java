@@ -13,7 +13,7 @@ public class Memory {
         Grafikspeicher: $E000-$FFFF
      */
 
-    private Memory() {
+    public Memory() {
         ram = new int[SIZE];
         Arrays.fill(ram, 0x0100, 0xE000, 0xFF); // $0100-$DFFF set $FF
     }

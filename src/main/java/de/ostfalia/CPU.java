@@ -87,6 +87,10 @@ public class CPU {
 
     }
 
+    public void connectMemory(Memory memory) {
+        this.memory = memory;
+    }
+
     private void debugOut(){
 
         System.out.print("----------------------------------------- \n");
@@ -275,8 +279,6 @@ public class CPU {
         ++ic;
     }
 
-    // TODO: HIER WEITER
-
     // AR wird nach R1/R2 kopiert.
     private void taw(){
         byte lowByte = (byte) (ar & 0xFF);
@@ -298,6 +300,8 @@ public class CPU {
         r2 = memory.read(ic + 2);
         ic += 3;
     }
+
+    // TODO: HIER WEITER
 
     // Springt zu der in AR angegebenen Adresse, falls R0=$00 ist.
     private void jz0(){

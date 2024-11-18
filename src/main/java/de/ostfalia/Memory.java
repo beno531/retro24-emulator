@@ -1,12 +1,21 @@
 package de.ostfalia;
 
+import java.util.Arrays;
+
 public class Memory {
     private static final int SIZE = 65536; // 64KB Speichergröße
     private static Memory instance;
-    private byte[] ram;
+    private int[] ram;
+
+    /*
+        Speicher-Layout: I/O-Page bei $0000-$00FF,
+        Programmspeicher: $0100-$DFFF,
+        Grafikspeicher: $E000-$FFFF
+     */
 
     private Memory() {
-        ram = new byte[SIZE];
+        ram = new int[SIZE];
+        Arrays.fill(ram, 0x0100, 0xE000, 0xFF); // $0100-$DFFF set $FF
     }
 
     public static Memory getInstance() {
@@ -17,14 +26,14 @@ public class Memory {
     }
 
     public int read(int address) {
-        return Byte.toUnsignedInt(ram[address]);
+        return ram[address];
     }
 
-    public void write(int address, byte value) {
+    public void write(int address, int value) {
         ram[address] = value;
     }
 
     public void reset() {
-        ram = new byte[ram.length];
+        ram = new int[ram.length];
     }
 }

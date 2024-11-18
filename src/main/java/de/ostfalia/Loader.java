@@ -7,11 +7,11 @@ public class Loader {
         this.memory = Memory.getInstance();
     }
 
-    public void writeProgram(byte[] program, int startAddress) {
+    public void writeProgram(int[] program) {
 
-        int counter = startAddress;
+        int counter = 0X0100;
 
-        for (byte val : program) {
+        for (int val : program) {
             memory.write(counter, val);
             counter++;
         }

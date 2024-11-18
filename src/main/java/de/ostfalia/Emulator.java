@@ -14,9 +14,8 @@ public class Emulator {
         loader = new Loader();
     }
 
-    public void loadProgram(byte[] program, int startAddress) {
-        loader.writeProgram(program, startAddress);
-        this.cpu.setIc(startAddress);
+    public void loadProgram(int[] program) {
+        loader.writeProgram(program);
     }
 
     public void run() {

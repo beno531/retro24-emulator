@@ -43,7 +43,6 @@ public class CPU {
         opcodeMap.put(0x19, this::jz0); // JZ0 ($19, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R0=$00 ist.
         opcodeMap.put(0x20, this::jgw); // JGW ($20, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R1 > R2 ist.
         opcodeMap.put(0x21, this::jew); // JEW ($21, 1-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R1=R2 ist.
-        /*
         opcodeMap.put(0x22, this::or0); // OR0 ($22, 2-Byte-OP): Speichert in R0 das logische ODER aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
         opcodeMap.put(0x23, this::an0); // AN0 ($23, 2-Byte-OP): Speichert in R0 das logische UND aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
         opcodeMap.put(0x24, this::je0); // JE0 ($24, 2-Byte-OP): Springt zu der in AR angegebenen Adresse, falls R0 gleich dem nachfolgenden Byte ist.
@@ -56,7 +55,6 @@ public class CPU {
         opcodeMap.put(0x2B, this::c30); // C30 ($2B, 1-Byte-OP): Kopiert R3 nach R0.
         opcodeMap.put(0x2C, this::pl0); // PL0 ($2C, 1-Byte-OP): Schiebt die Bits in R0 um ein Bit nach „links“ (entspricht Teilen durch 2 ohne Rest)
         opcodeMap.put(0x2D, this::pr0); // PR0 ($2D, 1-Byte-OP): Schiebt die Bits in R0 um ein Bit nach „rechts“ (entspricht Multiplikation mit 2 ohne Übertrag).
-        */
         opcodeMap.put(0xFF, this::hlt); // HLT ($FF, 1-Byte-OP): Prozessor hält an
 
 
@@ -221,10 +219,12 @@ public class CPU {
         if (x < 0) {
             r1 = Math.abs(x);
 
-            --r2;
-            if (r2 < 0) {
+            int y = r2 - 1;
+            if (y < 0) {
                 r1 = 0x00;
                 r2 = 0x00;
+            } else {
+                r2 = y;
             }
         } else {
             r1 = x;
@@ -301,12 +301,10 @@ public class CPU {
         ic += 3;
     }
 
-    // TODO: HIER WEITER
-
     // Springt zu der in AR angegebenen Adresse, falls R0=$00 ist.
     private void jz0(){
         if(r0 == 0x00){
-            ic = memory.read(ar);
+            ic = ar;
         }
         else {
             ++ic;
@@ -316,7 +314,7 @@ public class CPU {
     // Springt zu der in AR angegebenen Adresse, falls R1 > R2 ist.
     private void jgw(){
         if(r1 > r2){
-            ic = memory.read(ar);
+            ic = ar;
         }
         else {
             ++ic;
@@ -326,22 +324,22 @@ public class CPU {
     // Springt zu der in AR angegebenen Adresse, falls R1=R2 ist.
     private void jew(){
         if(r1 == r2){
-            ic = memory.read(ar);
+            ic = ar;
         }
         else {
             ++ic;
         }
     }
-/*
+
     // Speichert in R0 das logische ODER aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
     private void or0(){
-        r0 = (byte) (r0 | memory.read(ic + 1));
+        r0 = (r0 | memory.read(ic + 1)) & 0xFF;
         ic += 2;
     }
 
     // Speichert in R0 das logische UND aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
     private void an0(){
-        r0 = (byte) (r0 & memory.read(ic + 1));
+        r0 = (r0 & memory.read(ic + 1)) & 0xFF;
         ic += 2;
     }
 
@@ -349,7 +347,7 @@ public class CPU {
     private void je0(){
 
         if(r0 == memory.read(ic + 1)){
-            ic = memory.read(ar);
+            ic = ar;
         }
         else {
             ic += 2;
@@ -358,27 +356,25 @@ public class CPU {
 
     // Kopiert R0 nach R1.
     private void c01(){
-        //r1 = r0;
-        ++ic;   // TODO: "Schreibt nach" überprüfen, ob wert zurückgesetzt wird
+        r1 = r0;
+        ++ic;
     }
 
     // Kopiert R0 nach R2.
     private void c02(){
-        //r2 = r0;
-        ++ic; // TODO: "Schreibt nach" überprüfen, ob wert zurückgesetzt wird
+        r2 = r0;
+        ++ic;
     }
-
-    // TODO: Ab HIER testen
 
     // Erhöht den Wert von R1 um 1. Bei Überlauf wird R2 um 1 erhöht. Läuft dabei wiederum R2 über, werden R1 und R2 zu $FF.
     private void irw(){
         int x = r1 + 1;
         if(x > 0xFF){
-            r1 = (byte) 0xFF;
-            r2 = (byte) Math.min(++r2, 0xFF);
+            r1 = 0xFF;
+            r2 = Math.min(r2 + 1, 0xFF);
         }
         else {
-            r1 = (byte) x;
+            r1 = x;
         }
         ++ic;
     }
@@ -388,15 +384,17 @@ public class CPU {
         int x = r1 - 1;
 
         if (x < 0) {
-            r1 = (byte) Math.abs(x);
+            r1 = Math.abs(x) & 0xFF;
 
-            --r2;
-            if (r2 < 0) {
+            int y = r2 - 1;
+            if (y < 0) {
                 r1 = 0x00;
                 r2 = 0x00;
+            } else {
+                r2 = y;
             }
         } else {
-            r1 = (byte) x;
+            r1 = x;
         }
         ++ic;
     }
@@ -404,41 +402,38 @@ public class CPU {
     // Vertauscht die Inhalte von R0 und R3.
     private void x03(){
         int temp = r0;
-        //r0 = r3;
-        r3 = (byte) temp;
+        r0 = r3;
+        r3 = temp;
         ++ic;
     }
 
     // Kopiert R0 nach R3.
     private void c03(){
-        //r3 = r0;
-        ++ic; // TODO: "Schreibt nach" überprüfen, ob wert zurückgesetzt wird
+        r3 = r0;
+        ++ic;
     }
 
     // Kopiert R3 nach R0.
     private void c30(){
-        //r0 = r3;
-        ++ic; // TODO: "Schreibt nach" überprüfen, ob wert zurückgesetzt wird
+        r0 = r3;
+        ++ic;
     }
 
-    // Schiebt die Bits in R0 um ein Bit nach „links“ (entspricht Teilen durch 2 ohne Rest)
+    // Schiebt die Bits in R0 um ein Bit nach „links“
     private void pl0(){
-        r0 = (byte) (r0 << 1);
+        r0 = (r0 << 1);
         ++ic;
     }
 
-    // Schiebt die Bits in R0 um ein Bit nach „rechts“ (entspricht Multiplikation mit 2 ohne Übertrag).
+    // Schiebt die Bits in R0 um ein Bit nach „rechts“
     private void pr0(){
-        r0 = (byte) (r0 >> 1);
+        r0 = (r0 >> 1);
         ++ic;
     }
-
-    */
 
     // Prozessor hält an
     private void hlt(){
         running = false;
-        ++ic;
     }
 
 }

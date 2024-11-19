@@ -37,7 +37,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
+        Assertions.assertEquals(0x0100, emulator.getCpu().getIc());
     }
 
     @Test
@@ -52,7 +52,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0102, emulator.getCpu().getIc());
+        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     @Test
@@ -409,11 +409,11 @@ class EmulatorTest {
 
         emulator.loadProgram(program);
 
-        emulator.getCpu().setAr(0x01FFF);
+        emulator.getCpu().setAr(0x01FF);
 
         emulator.run();
 
-        Assertions.assertEquals(0x2000, emulator.getCpu().getIc());
+        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     @Test
@@ -540,374 +540,478 @@ class EmulatorTest {
         Assertions.assertEquals(0x11, emulator.getCpu().getR1());
         Assertions.assertEquals(0x22, emulator.getCpu().getR2());
     }
-/*
+
     // R0 != 0x00
     @Test
     void testJZ0_1() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x19,
-                (byte) 0xFF
+        int[] program = {
+                0x19
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR0(0x01);
-        cpu.setAr(0x8888);
-        memory.write(0x8888, 0XEE);
-        memory.write(0x00EE, 0XDD);
+        emulator.getCpu().setR0(0x01);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x0101, cpu.getIc());
+        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R0 == 0x00
     @Test
     void testJZ0_2() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x19
+        int[] program = {
+                0x19
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR0(0x00);
-        cpu.setAr(0x8888);
-        memory.write(0x8888, 0XEE);
-        memory.write(0x00EE, 0XDD); // TODO
+        emulator.getCpu().setR0(0x00);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x00EE, cpu.getIc());
+        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
     }
-/*
+
     // R1 < R2
     @Test
     void testJGW_1() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x20,
-                (byte) 0xFF
+        int[] program = {
+                0x20
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR1(0x01);
-        cpu.setR2(0x02);
-        cpu.setAr(0x8888);
-        memory.write(0x8888, 0XEE);
-        memory.write(0x00EE, 0XDD);
+        emulator.getCpu().setR1(0x01);
+        emulator.getCpu().setR2(0x02);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x0101, cpu.getIc());
+        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 == R2
     @Test
     void testJGW_2() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x20,
-                (byte) 0xFF
+        int[] program = {
+                0x20
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR1(0x01);
-        cpu.setR2(0x01);
-        cpu.setAr(0x8888);
-        memory.write(0x8888, 0XEE);
-        memory.write(0x00EE, 0XDD);
+        emulator.getCpu().setR1(0x01);
+        emulator.getCpu().setR2(0x01);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x0101, cpu.getIc());
+        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 > R2
     @Test
     void testJGW_3() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x20
+        int[] program = {
+                0x20
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR1(0x02);
-        cpu.setR2(0x01);
-        cpu.setAr(0x8888);
-        memory.write(0x8888, 0XEE);
-        memory.write(0x00EE, 0XDD); // TODO
+        emulator.getCpu().setR1(0x02);
+        emulator.getCpu().setR2(0x01);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x00EE, cpu.getIc());
+        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     // R1 < R2
     @Test
     void testJEW_1() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x21,
-                (byte) 0xFF
+        int[] program = {
+                0x21
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR1(0x01);
-        cpu.setR2(0x02);
-        cpu.setAr(0x8888);
-        memory.write(0x8888, 0XEE);
-        memory.write(0x00EE, 0XDD);
+        emulator.getCpu().setR1(0x01);
+        emulator.getCpu().setR2(0x02);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x0101, cpu.getIc());
+        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 > R2
     @Test
     void testJEW_2() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x21,
-                (byte) 0xFF
+        int[] program = {
+                0x21
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR1(0x02);
-        cpu.setR2(0x01);
-        cpu.setAr(0x8888);
-        memory.write(0x8888, 0XEE);
-        memory.write(0x00EE, 0XDD);
+        emulator.getCpu().setR1(0x02);
+        emulator.getCpu().setR2(0x01);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x0101, cpu.getIc());
+        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 == R2
     @Test
     void testJEW_3() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x21
+        int[] program = {
+                0x21
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR1(0x02);
-        cpu.setR2(0x02);
-        cpu.setAr(0x8888);
-        memory.write(0x8888, 0XEE);
-        memory.write(0x00EE, 0XDD); // TODO
+        emulator.getCpu().setR1(0x02);
+        emulator.getCpu().setR2(0x02);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x00EE, cpu.getIc());
+        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     @Test
     void testOR0() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x22, 0x11,
-                (byte) 0xFF
+        int[] program = {
+                0x22, 0x11
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR0(0x22);
+        emulator.getCpu().setR0(0x22);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x33, cpu.getR0());
+        Assertions.assertEquals(0x33, emulator.getCpu().getR0());
     }
 
     @Test
     void testAN0() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x23, 0x09,
-                (byte) 0xFF
+        int[] program = {
+                0x23, 0x09
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR0(0x33);
+        emulator.getCpu().setR0(0x33);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x01, cpu.getR0());
+        Assertions.assertEquals(0x01, emulator.getCpu().getR0());
     }
 
     // R0 gleich dem nachfolgenden Byte
     @Test
     void testJE0_1() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x24, 0x11,
-                (byte) 0xFF
+        int[] program = {
+                0x24, 0xCC
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR0(0x11);
-        cpu.setAr(0x0011);
-        memory.write(0x0011, 0XEE);
-        memory.write(0x00EE, 0XDD); // TODO
+        emulator.getCpu().setR0(0xCC);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x00EE, cpu.getIc());
+        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     // R0 ungleich dem nachfolgenden Byte
     @Test
     void testJE0_2() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x24, 0x11,
-                (byte) 0xFF
+        int[] program = {
+                0x24, 0xCC
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR0(0x12);
-        memory.write(0x0011, 0XEE);
-        memory.write(0x00EE, 0XDD); // TODO
+        emulator.getCpu().setR0(0xEE);
+        emulator.getCpu().setAr(0x01FF);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0x0102, cpu.getIc());
+        Assertions.assertEquals(0x0102, emulator.getCpu().getIc());
     }
 
     // R0 ungleich dem nachfolgenden Byte
     @Test
     void testC01() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x25,
-                (byte) 0xFF
+        int[] program = {
+                0x25
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR0(0xAA);
-        cpu.setR1(0x00);
+        emulator.getCpu().setR0(0xFE);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0xAA, cpu.getR1());
+        Assertions.assertEquals(0xFE, emulator.getCpu().getR1());
     }
 
     // R0 ungleich dem nachfolgenden Byte
     @Test
     void testC02() {
+        Emulator emulator = new Emulator();
 
-        int startAddress = 0x0100;
-
-        CPU cpu = new CPU();
-        Loader loader = new Loader();
-
-        byte[] program = {
-                (byte) 0x26,
-                (byte) 0xFF
+        int[] program = {
+                0x26
         };
 
-        loader.writeProgram(program, startAddress);
-        cpu.setIc(startAddress);
+        emulator.loadProgram(program);
 
-        cpu.setR0(0xAA);
-        cpu.setR2(0x00);
+        emulator.getCpu().setR0(0xFE);
 
-        cpu.startup();
+        emulator.run();
 
-        Assertions.assertEquals(0xAA, cpu.getR2());
+        Assertions.assertEquals(0xFE, emulator.getCpu().getR2());
     }
-      */
+
+    // Kein Übelauf von r1, kein Übelauf von r2
+    @Test
+    void testIRW_1() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x27
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR1(0x00);
+        emulator.getCpu().setR2(0x00);
+
+        emulator.run();
+
+        Assertions.assertEquals(0x01, emulator.getCpu().getR1());
+        Assertions.assertEquals(0x00, emulator.getCpu().getR2());
+    }
+
+    // Übelauf von r1, kein Übelauf von r2
+    @Test
+    void testIRW_2() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x27
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR1(0xFF);
+        emulator.getCpu().setR2(0x00);
+
+        emulator.run();
+
+        Assertions.assertEquals(0xFF, emulator.getCpu().getR1());
+        Assertions.assertEquals(0x01, emulator.getCpu().getR2());
+    }
+
+    // Übelauf von r1, übelauf von r2
+    @Test
+    void testIRW_3() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x27
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR1(0xFF);
+        emulator.getCpu().setR2(0xFF);
+
+        emulator.run();
+
+        Assertions.assertEquals(0xFF, emulator.getCpu().getR1());
+        Assertions.assertEquals(0xFF, emulator.getCpu().getR2());
+    }
+
+    // Kein negatives Ergebnis, Kein Unterlauf von r2
+    @Test
+    void testDRW_1() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x28
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR1(0x02);
+        emulator.getCpu().setR2(0x02);
+
+        emulator.run();
+
+        Assertions.assertEquals(0x01, emulator.getCpu().getR1());
+        Assertions.assertEquals(0x02, emulator.getCpu().getR2());
+    }
+
+    // negatives Ergebnis, Kein Unterlauf von r2
+    @Test
+    void testDRW_2() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x28
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR1(0x00);
+        emulator.getCpu().setR2(0x02);
+
+        emulator.run();
+
+        Assertions.assertEquals(0x01, emulator.getCpu().getR1());
+        Assertions.assertEquals(0x01, emulator.getCpu().getR2());
+    }
+
+    // negatives Ergebnis, Unterlauf von r2
+    @Test
+    void testDRW_3() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x28
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR1(0x00);
+        emulator.getCpu().setR2(0x00);
+
+        emulator.run();
+
+        Assertions.assertEquals(0x00, emulator.getCpu().getR1());
+        Assertions.assertEquals(0x00, emulator.getCpu().getR2());
+    }
+
+    @Test
+    void testX03() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x29
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR0(0xAA);
+        emulator.getCpu().setR3(0xFF);
+
+        emulator.run();
+
+        Assertions.assertEquals(0xFF, emulator.getCpu().getR0());
+        Assertions.assertEquals(0xAA, emulator.getCpu().getR3());
+    }
+
+    @Test
+    void testC03() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x2A
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR0(0xAA);
+
+        emulator.run();
+
+        Assertions.assertEquals(0xAA, emulator.getCpu().getR3());
+    }
+
+    @Test
+    void testC30() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x2B
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR3(0xAA);
+
+        emulator.run();
+
+        Assertions.assertEquals(0xAA, emulator.getCpu().getR0());
+    }
+
+    @Test
+    void testPL0() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x2C
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR0(0x01);
+
+        emulator.run();
+
+        Assertions.assertEquals(0x02, emulator.getCpu().getR0());
+    }
+
+    @Test
+    void testPR0() {
+        Emulator emulator = new Emulator();
+
+        int[] program = {
+                0x2D
+        };
+
+        emulator.loadProgram(program);
+
+        emulator.getCpu().setR0(0x02);
+
+        emulator.run();
+
+        Assertions.assertEquals(0x01, emulator.getCpu().getR0());
+    }
 
 }

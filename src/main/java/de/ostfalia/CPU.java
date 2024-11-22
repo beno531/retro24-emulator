@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 public class CPU {
 
-    // Register
     private int ar = 0x0000;  // Address Register
     private int ic = 0x0100;  // Instruction Counter
     private int r0 = 0x00;
@@ -56,27 +55,22 @@ public class CPU {
         opcodeMap.put(0x2C, this::pl0); // PL0 ($2C, 1-Byte-OP): Schiebt die Bits in R0 um ein Bit nach „links“ (entspricht Teilen durch 2 ohne Rest)
         opcodeMap.put(0x2D, this::pr0); // PR0 ($2D, 1-Byte-OP): Schiebt die Bits in R0 um ein Bit nach „rechts“ (entspricht Multiplikation mit 2 ohne Übertrag).
         opcodeMap.put(0xFF, this::hlt); // HLT ($FF, 1-Byte-OP): Prozessor hält an
-
-
-
     }
 
     public void startup() {
 
         while(running){
 
-            debugOut();
-
             int opcode = memory.read(ic);
+
+            debugOut(opcode);
 
             Runnable instruction = opcodeMap.get(opcode);
 
             if (instruction != null) {
                 instruction.run();
             } else {
-                break;
-                //throw new IllegalStateException("Unbekannter Opcode: " + opcode);
-
+                throw new IllegalStateException("Unbekannter Opcode: " + opcode);
             }
         }
 
@@ -89,9 +83,11 @@ public class CPU {
         this.memory = memory;
     }
 
-    private void debugOut(){
+    private void debugOut(int opcode){
 
         System.out.print("----------------------------------------- \n");
+
+        System.out.printf("Execute Opcode: 0x%02X%n", opcode);
 
         System.out.printf("AR: 0x%04X%n", this.ar);
         System.out.printf("IC: 0x%04X%n", this.ic);

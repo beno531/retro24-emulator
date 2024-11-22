@@ -1,7 +1,5 @@
 package de.ostfalia;
 
-import java.lang.reflect.Constructor;
-
 public class Emulator {
 
     private Memory memory;
@@ -9,7 +7,6 @@ public class Emulator {
     private Loader loader;
 
     public Emulator(){
-        //this.memory = Memory.getInstance();
         this.memory = new Memory();
 
         this.cpu = new CPU();
@@ -21,6 +18,9 @@ public class Emulator {
 
     public void loadProgram(int[] program) {
         loader.writeProgram(program);
+    }
+    public void loadProgram(String filePath) {
+        loader.writeProgram(filePath);
     }
 
     public void run() {

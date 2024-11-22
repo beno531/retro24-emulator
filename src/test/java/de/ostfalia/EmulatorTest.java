@@ -1,6 +1,5 @@
 package de.ostfalia;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,9 +19,9 @@ class EmulatorTest {
 
         emulator.loadProgram(program);
 
-        Assertions.assertEquals(0x01, emulator.getMemory().read(0x0100));
-        Assertions.assertEquals(0x02, emulator.getMemory().read(0x0101));
-        Assertions.assertEquals(0x03, emulator.getMemory().read(0x0102));
+        assertEquals(0x01, emulator.getMemory().read(0x0100));
+        assertEquals(0x02, emulator.getMemory().read(0x0101));
+        assertEquals(0x03, emulator.getMemory().read(0x0102));
     }
 
     @Test
@@ -37,7 +36,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0100, emulator.getCpu().getIc());
+        assertEquals(0x0100, emulator.getCpu().getIc());
     }
 
     @Test
@@ -52,7 +51,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
+        assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     @Test
@@ -67,7 +66,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x1234, emulator.getCpu().getAr());
+        assertEquals(0x1234, emulator.getCpu().getAr());
     }
 
     @Test
@@ -83,7 +82,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x5678, emulator.getCpu().getAr());
+        assertEquals(0x5678, emulator.getCpu().getAr());
     }
 
     @Test
@@ -100,8 +99,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x00, emulator.getMemory().read(0x0200));
-        Assertions.assertEquals(0x01, emulator.getMemory().read(0x0201));
+        assertEquals(0x00, emulator.getMemory().read(0x0200));
+        assertEquals(0x01, emulator.getMemory().read(0x0201));
     }
 
     @Test
@@ -119,7 +118,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x1234, emulator.getCpu().getAr());
+        assertEquals(0x1234, emulator.getCpu().getAr());
     }
 
     // Kein Überlauf
@@ -138,7 +137,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x09FF, emulator.getCpu().getAr());
+        assertEquals(0x09FF, emulator.getCpu().getAr());
     }
 
     // Überlauf wird verworfen
@@ -157,7 +156,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFFFF, emulator.getCpu().getAr());
+        assertEquals(0xFFFF, emulator.getCpu().getAr());
     }
 
     // Kein Überlauf
@@ -175,7 +174,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x35, emulator.getCpu().getR0());
+        assertEquals(0x35, emulator.getCpu().getR0());
     }
 
     // Überlauf
@@ -193,7 +192,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR0());
+        assertEquals(0xFF, emulator.getCpu().getR0());
     }
 
     // Kein Überlauf von r1, Kein Überlauf von r2
@@ -213,8 +212,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xF9, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x00, emulator.getCpu().getR2());
+        assertEquals(0xF9, emulator.getCpu().getR1());
+        assertEquals(0x00, emulator.getCpu().getR2());
     }
 
     // Überlauf von r1, Kein Überlauf von r2
@@ -234,8 +233,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x01, emulator.getCpu().getR2());
+        assertEquals(0xFF, emulator.getCpu().getR1());
+        assertEquals(0x01, emulator.getCpu().getR2());
     }
 
     // Überlauf von r1 und r2
@@ -255,8 +254,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR1());
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR2());
+        assertEquals(0xFF, emulator.getCpu().getR1());
+        assertEquals(0xFF, emulator.getCpu().getR2());
     }
 
     // Kein Unterlauf
@@ -274,7 +273,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x09, emulator.getCpu().getR0());
+        assertEquals(0x09, emulator.getCpu().getR0());
     }
 
     // Unterlauf
@@ -292,7 +291,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x00, emulator.getCpu().getR0());
+        assertEquals(0x00, emulator.getCpu().getR0());
     }
 
     // Kein Unterlauf, kein negatives Ergebnis
@@ -312,9 +311,9 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x03, emulator.getCpu().getR0());
-        Assertions.assertEquals(0x7C, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x00, emulator.getCpu().getR2());
+        assertEquals(0x03, emulator.getCpu().getR0());
+        assertEquals(0x7C, emulator.getCpu().getR1());
+        assertEquals(0x00, emulator.getCpu().getR2());
     }
 
     // Kein Unterlauf, negatives Ergebnis
@@ -334,9 +333,9 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x08, emulator.getCpu().getR0());
-        Assertions.assertEquals(0x04, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x05, emulator.getCpu().getR2());
+        assertEquals(0x08, emulator.getCpu().getR0());
+        assertEquals(0x04, emulator.getCpu().getR1());
+        assertEquals(0x05, emulator.getCpu().getR2());
     }
 
     // Unterlauf, negatives Ergebnis
@@ -356,9 +355,9 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x08, emulator.getCpu().getR0());
-        Assertions.assertEquals(0x00, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x00, emulator.getCpu().getR2());
+        assertEquals(0x08, emulator.getCpu().getR0());
+        assertEquals(0x00, emulator.getCpu().getR1());
+        assertEquals(0x00, emulator.getCpu().getR2());
     }
 
     @Test
@@ -376,8 +375,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR1());
-        Assertions.assertEquals(0xAA, emulator.getCpu().getR2());
+        assertEquals(0xFF, emulator.getCpu().getR1());
+        assertEquals(0xAA, emulator.getCpu().getR2());
     }
 
     @Test
@@ -395,8 +394,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR0());
-        Assertions.assertEquals(0xAA, emulator.getCpu().getR1());
+        assertEquals(0xFF, emulator.getCpu().getR0());
+        assertEquals(0xAA, emulator.getCpu().getR1());
     }
 
     @Test
@@ -413,7 +412,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
+        assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     @Test
@@ -431,7 +430,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xBB, emulator.getMemory().read(0xAAAA));
+        assertEquals(0xBB, emulator.getMemory().read(0xAAAA));
     }
 
     @Test
@@ -450,8 +449,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xBB, emulator.getMemory().read(0xAAAA));
-        Assertions.assertEquals(0xCC, emulator.getMemory().read(0xAAAB));
+        assertEquals(0xBB, emulator.getMemory().read(0xAAAA));
+        assertEquals(0xCC, emulator.getMemory().read(0xAAAB));
     }
 
     @Test
@@ -469,7 +468,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xEE, emulator.getCpu().getR0());
+        assertEquals(0xEE, emulator.getCpu().getR0());
     }
 
     @Test
@@ -488,8 +487,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xEE, emulator.getCpu().getR1());
-        Assertions.assertEquals(0xDD, emulator.getCpu().getR2());
+        assertEquals(0xEE, emulator.getCpu().getR1());
+        assertEquals(0xDD, emulator.getCpu().getR2());
     }
 
     @Test
@@ -506,8 +505,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x34, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x12, emulator.getCpu().getR2());
+        assertEquals(0x34, emulator.getCpu().getR1());
+        assertEquals(0x12, emulator.getCpu().getR2());
     }
 
     @Test
@@ -522,7 +521,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x99, emulator.getCpu().getR0());
+        assertEquals(0x99, emulator.getCpu().getR0());
     }
 
     @Test
@@ -537,8 +536,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x11, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x22, emulator.getCpu().getR2());
+        assertEquals(0x11, emulator.getCpu().getR1());
+        assertEquals(0x22, emulator.getCpu().getR2());
     }
 
     // R0 != 0x00
@@ -557,7 +556,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
+        assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R0 == 0x00
@@ -576,7 +575,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
+        assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     // R1 < R2
@@ -596,7 +595,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
+        assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 == R2
@@ -616,7 +615,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
+        assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 > R2
@@ -636,7 +635,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
+        assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     // R1 < R2
@@ -656,7 +655,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
+        assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 > R2
@@ -676,7 +675,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0101, emulator.getCpu().getIc());
+        assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 == R2
@@ -696,7 +695,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
+        assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     @Test
@@ -713,7 +712,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x33, emulator.getCpu().getR0());
+        assertEquals(0x33, emulator.getCpu().getR0());
     }
 
     @Test
@@ -730,7 +729,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01, emulator.getCpu().getR0());
+        assertEquals(0x01, emulator.getCpu().getR0());
     }
 
     // R0 gleich dem nachfolgenden Byte
@@ -749,7 +748,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01FF, emulator.getCpu().getIc());
+        assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     // R0 ungleich dem nachfolgenden Byte
@@ -768,7 +767,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x0102, emulator.getCpu().getIc());
+        assertEquals(0x0102, emulator.getCpu().getIc());
     }
 
     // R0 ungleich dem nachfolgenden Byte
@@ -786,7 +785,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFE, emulator.getCpu().getR1());
+        assertEquals(0xFE, emulator.getCpu().getR1());
     }
 
     // R0 ungleich dem nachfolgenden Byte
@@ -804,7 +803,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFE, emulator.getCpu().getR2());
+        assertEquals(0xFE, emulator.getCpu().getR2());
     }
 
     // Kein Übelauf von r1, kein Übelauf von r2
@@ -823,8 +822,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x00, emulator.getCpu().getR2());
+        assertEquals(0x01, emulator.getCpu().getR1());
+        assertEquals(0x00, emulator.getCpu().getR2());
     }
 
     // Übelauf von r1, kein Übelauf von r2
@@ -843,8 +842,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x01, emulator.getCpu().getR2());
+        assertEquals(0xFF, emulator.getCpu().getR1());
+        assertEquals(0x01, emulator.getCpu().getR2());
     }
 
     // Übelauf von r1, übelauf von r2
@@ -863,8 +862,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR1());
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR2());
+        assertEquals(0xFF, emulator.getCpu().getR1());
+        assertEquals(0xFF, emulator.getCpu().getR2());
     }
 
     // Kein negatives Ergebnis, Kein Unterlauf von r2
@@ -883,8 +882,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x02, emulator.getCpu().getR2());
+        assertEquals(0x01, emulator.getCpu().getR1());
+        assertEquals(0x02, emulator.getCpu().getR2());
     }
 
     // negatives Ergebnis, Kein Unterlauf von r2
@@ -903,8 +902,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x01, emulator.getCpu().getR2());
+        assertEquals(0x01, emulator.getCpu().getR1());
+        assertEquals(0x01, emulator.getCpu().getR2());
     }
 
     // negatives Ergebnis, Unterlauf von r2
@@ -923,8 +922,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x00, emulator.getCpu().getR1());
-        Assertions.assertEquals(0x00, emulator.getCpu().getR2());
+        assertEquals(0x00, emulator.getCpu().getR1());
+        assertEquals(0x00, emulator.getCpu().getR2());
     }
 
     @Test
@@ -942,8 +941,8 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xFF, emulator.getCpu().getR0());
-        Assertions.assertEquals(0xAA, emulator.getCpu().getR3());
+        assertEquals(0xFF, emulator.getCpu().getR0());
+        assertEquals(0xAA, emulator.getCpu().getR3());
     }
 
     @Test
@@ -960,7 +959,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xAA, emulator.getCpu().getR3());
+        assertEquals(0xAA, emulator.getCpu().getR3());
     }
 
     @Test
@@ -977,7 +976,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0xAA, emulator.getCpu().getR0());
+        assertEquals(0xAA, emulator.getCpu().getR0());
     }
 
     @Test
@@ -994,7 +993,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x02, emulator.getCpu().getR0());
+        assertEquals(0x02, emulator.getCpu().getR0());
     }
 
     @Test
@@ -1011,7 +1010,7 @@ class EmulatorTest {
 
         emulator.run();
 
-        Assertions.assertEquals(0x01, emulator.getCpu().getR0());
+        assertEquals(0x01, emulator.getCpu().getR0());
     }
 
 }

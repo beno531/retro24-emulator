@@ -32,8 +32,4 @@ public class Memory {
     public void write(int address, int value) {
         ram[address] = value;
     }
-
-    public void reset() {
-        ram = new int[ram.length];
-    }
 }

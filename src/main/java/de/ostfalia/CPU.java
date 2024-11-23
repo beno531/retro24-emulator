@@ -164,8 +164,8 @@ public class CPU {
 
     // Speichert IC an die im AR angegebene Adresse.
     private void sic(){
-        byte lowByte = (byte) (ic & 0xFF);
-        byte highByte = (byte) ((ic >> 8) & 0xFF);
+        int lowByte = ic & 0xFF;
+        int highByte = (ic >> 8) & 0xFF;
         memory.write(ar, lowByte);
         memory.write(ar + 1, highByte);
         ic += 1;
@@ -194,7 +194,7 @@ public class CPU {
         int x = r1 + r0;
         if(x > 0xFF){
             r1 = 0xFF;
-            r2 = Math.min(++r2, 0xFF);
+            r2 = Math.min(r2 + 1, 0xFF);
         }
         else {
             r1 = x;
@@ -277,8 +277,8 @@ public class CPU {
 
     // AR wird nach R1/R2 kopiert.
     private void taw(){
-        byte lowByte = (byte) (ar & 0xFF);
-        byte highByte = (byte) ((ar >> 8) & 0xFF);
+        int lowByte = ar & 0xFF;
+        int highByte = (ar >> 8) & 0xFF;
         r1 = lowByte;
         r2 = highByte;
         ++ic;

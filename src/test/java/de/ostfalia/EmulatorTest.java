@@ -8,7 +8,7 @@ class EmulatorTest {
 
     // Loader Test
     @Test
-    void testLOADER() {
+    void testLOADER(){
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -24,8 +24,54 @@ class EmulatorTest {
         assertEquals(0x03, emulator.getMemory().read(0x0102));
     }
 
+    // Test AR Wraparound
     @Test
-    void testHLT() {
+    void testWrapAr_1(){
+        Emulator emulator = new Emulator();
+
+        emulator.getCpu().setAr(0xFFFF);
+
+        emulator.getCpu().incrAr(1);
+
+        assertEquals(0x0000, emulator.getCpu().getAr());
+    }
+
+    @Test
+    void testWrapAr_2(){
+        Emulator emulator = new Emulator();
+
+        emulator.getCpu().setAr(0xFFFF);
+
+        emulator.getCpu().incrAr(5);
+
+        assertEquals(0x0004, emulator.getCpu().getAr());
+    }
+
+    // Test AR Wraparound
+    @Test
+    void testWrapIc_1(){
+        Emulator emulator = new Emulator();
+
+        emulator.getCpu().setIc(0xFFFF);
+
+        emulator.getCpu().incrIc(1);
+
+        assertEquals(0x0000, emulator.getCpu().getIc());
+    }
+
+    @Test
+    void testWrapIc_2(){
+        Emulator emulator = new Emulator();
+
+        emulator.getCpu().setIc(0xFFFF);
+
+        emulator.getCpu().incrIc(5);
+
+        assertEquals(0x0004, emulator.getCpu().getIc());
+    }
+
+    @Test
+    void testHLT() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -34,13 +80,15 @@ class EmulatorTest {
 
         emulator.loadProgram(program);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
-        assertEquals(0x0100, emulator.getCpu().getIc());
+        assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     @Test
-    void testNUL() {
+    void testNUL() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -49,13 +97,15 @@ class EmulatorTest {
 
         emulator.loadProgram(program);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     @Test
-    void testMAR_1() {
+    void testMAR_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -64,13 +114,15 @@ class EmulatorTest {
 
         emulator.loadProgram(program);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x1234, emulator.getCpu().getAr());
     }
 
     @Test
-    void testMAR_2() {
+    void testMAR_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -80,13 +132,15 @@ class EmulatorTest {
 
         emulator.loadProgram(program);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x5678, emulator.getCpu().getAr());
     }
 
     @Test
-    void testSIC() {
+    void testSIC() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -97,14 +151,16 @@ class EmulatorTest {
 
         emulator.getCpu().setAr(0x0200);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x00, emulator.getMemory().read(0x0200));
         assertEquals(0x01, emulator.getMemory().read(0x0201));
     }
 
     @Test
-    void testRAR() {
+    void testRAR() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -116,14 +172,16 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x34);
         emulator.getCpu().setR2(0x12);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x1234, emulator.getCpu().getAr());
     }
 
     // Kein Überlauf
     @Test
-    void testAAR_1() {
+    void testAAR_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -135,14 +193,16 @@ class EmulatorTest {
         emulator.getCpu().setR0(0xFF);
         emulator.getCpu().setAr(0x0900);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x09FF, emulator.getCpu().getAr());
     }
 
     // Überlauf wird verworfen
     @Test
-    void testAAR_2() {
+    void testAAR_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -154,14 +214,16 @@ class EmulatorTest {
         emulator.getCpu().setR0(0xFF);
         emulator.getCpu().setAr(0xFFFF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFFFF, emulator.getCpu().getAr());
     }
 
     // Kein Überlauf
     @Test
-    void testIR0_1() {
+    void testIR0_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -172,14 +234,16 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0x34);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x35, emulator.getCpu().getR0());
     }
 
     // Überlauf
     @Test
-    void testIR0_2() {
+    void testIR0_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -190,14 +254,16 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0xFF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFF, emulator.getCpu().getR0());
     }
 
     // Kein Überlauf von r1, Kein Überlauf von r2
     @Test
-    void testA01_1() {
+    void testA01_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -210,7 +276,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x09);
         emulator.getCpu().setR2(0x00);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xF9, emulator.getCpu().getR1());
         assertEquals(0x00, emulator.getCpu().getR2());
@@ -218,7 +286,7 @@ class EmulatorTest {
 
     // Überlauf von r1, Kein Überlauf von r2
     @Test
-    void testA01_2() {
+    void testA01_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -231,7 +299,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0xF0);
         emulator.getCpu().setR2(0x00);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFF, emulator.getCpu().getR1());
         assertEquals(0x01, emulator.getCpu().getR2());
@@ -239,7 +309,7 @@ class EmulatorTest {
 
     // Überlauf von r1 und r2
     @Test
-    void testA01_3() {
+    void testA01_3() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -252,7 +322,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0xF0);
         emulator.getCpu().setR2(0xFF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFF, emulator.getCpu().getR1());
         assertEquals(0xFF, emulator.getCpu().getR2());
@@ -260,7 +332,7 @@ class EmulatorTest {
 
     // Kein Unterlauf
     @Test
-    void testDR0_1() {
+    void testDR0_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -271,14 +343,16 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0x0A);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x09, emulator.getCpu().getR0());
     }
 
     // Unterlauf
     @Test
-    void testDR0_2() {
+    void testDR0_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -289,14 +363,16 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0x00);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x00, emulator.getCpu().getR0());
     }
 
     // Kein Unterlauf, kein negatives Ergebnis
     @Test
-    void testS01_1() {
+    void testS01_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -309,7 +385,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x7F);
         emulator.getCpu().setR2(0x00);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x03, emulator.getCpu().getR0());
         assertEquals(0x7C, emulator.getCpu().getR1());
@@ -318,7 +396,7 @@ class EmulatorTest {
 
     // Kein Unterlauf, negatives Ergebnis
     @Test
-    void testS01_2() {
+    void testS01_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -331,7 +409,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x04);
         emulator.getCpu().setR2(0x06);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x08, emulator.getCpu().getR0());
         assertEquals(0x04, emulator.getCpu().getR1());
@@ -340,7 +420,7 @@ class EmulatorTest {
 
     // Unterlauf, negatives Ergebnis
     @Test
-    void testS01_3() {
+    void testS01_3() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -353,7 +433,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x04);
         emulator.getCpu().setR2(0x00);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x08, emulator.getCpu().getR0());
         assertEquals(0x00, emulator.getCpu().getR1());
@@ -361,7 +443,7 @@ class EmulatorTest {
     }
 
     @Test
-    void testX12() {
+    void testX12() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -373,14 +455,16 @@ class EmulatorTest {
         emulator.getCpu().setR1(0xAA);
         emulator.getCpu().setR2(0xFF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFF, emulator.getCpu().getR1());
         assertEquals(0xAA, emulator.getCpu().getR2());
     }
 
     @Test
-    void testX01() {
+    void testX01() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -392,14 +476,16 @@ class EmulatorTest {
         emulator.getCpu().setR0(0xAA);
         emulator.getCpu().setR1(0xFF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFF, emulator.getCpu().getR0());
         assertEquals(0xAA, emulator.getCpu().getR1());
     }
 
     @Test
-    void testJMP() {
+    void testJMP() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -410,13 +496,15 @@ class EmulatorTest {
 
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     @Test
-    void testSR0() {
+    void testSR0() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -428,13 +516,15 @@ class EmulatorTest {
         emulator.getCpu().setAr(0xAAAA);
         emulator.getCpu().setR0(0xBB);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xBB, emulator.getMemory().read(0xAAAA));
     }
 
     @Test
-    void testSRW() {
+    void testSRW() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -447,14 +537,16 @@ class EmulatorTest {
         emulator.getCpu().setR1(0xBB);
         emulator.getCpu().setR2(0xCC);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xBB, emulator.getMemory().read(0xAAAA));
         assertEquals(0xCC, emulator.getMemory().read(0xAAAB));
     }
 
     @Test
-    void testLR0() {
+    void testLR0() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -466,13 +558,15 @@ class EmulatorTest {
         emulator.getCpu().setAr(0xAAAA);
         emulator.getMemory().write(0xAAAA, 0xEE);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xEE, emulator.getCpu().getR0());
     }
 
     @Test
-    void testLRW() {
+    void testLRW() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -485,14 +579,16 @@ class EmulatorTest {
         emulator.getMemory().write(0xAAAA, 0xEE);
         emulator.getMemory().write(0xAAAB, 0xDD);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xEE, emulator.getCpu().getR1());
         assertEquals(0xDD, emulator.getCpu().getR2());
     }
 
     @Test
-    void testTAW() {
+    void testTAW() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -503,14 +599,16 @@ class EmulatorTest {
 
         emulator.getCpu().setAr(0x1234);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x34, emulator.getCpu().getR1());
         assertEquals(0x12, emulator.getCpu().getR2());
     }
 
     @Test
-    void testMR0() {
+    void testMR0() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -519,13 +617,15 @@ class EmulatorTest {
 
         emulator.loadProgram(program);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x99, emulator.getCpu().getR0());
     }
 
     @Test
-    void testMRW() {
+    void testMRW() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -534,7 +634,9 @@ class EmulatorTest {
 
         emulator.loadProgram(program);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x11, emulator.getCpu().getR1());
         assertEquals(0x22, emulator.getCpu().getR2());
@@ -542,7 +644,7 @@ class EmulatorTest {
 
     // R0 != 0x00
     @Test
-    void testJZ0_1() {
+    void testJZ0_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -554,14 +656,16 @@ class EmulatorTest {
         emulator.getCpu().setR0(0x01);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R0 == 0x00
     @Test
-    void testJZ0_2() {
+    void testJZ0_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -573,14 +677,16 @@ class EmulatorTest {
         emulator.getCpu().setR0(0x00);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     // R1 < R2
     @Test
-    void testJGW_1() {
+    void testJGW_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -593,14 +699,16 @@ class EmulatorTest {
         emulator.getCpu().setR2(0x02);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 == R2
     @Test
-    void testJGW_2() {
+    void testJGW_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -613,14 +721,16 @@ class EmulatorTest {
         emulator.getCpu().setR2(0x01);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 > R2
     @Test
-    void testJGW_3() {
+    void testJGW_3() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -633,14 +743,16 @@ class EmulatorTest {
         emulator.getCpu().setR2(0x01);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     // R1 < R2
     @Test
-    void testJEW_1() {
+    void testJEW_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -653,14 +765,16 @@ class EmulatorTest {
         emulator.getCpu().setR2(0x02);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 > R2
     @Test
-    void testJEW_2() {
+    void testJEW_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -673,14 +787,16 @@ class EmulatorTest {
         emulator.getCpu().setR2(0x01);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x0101, emulator.getCpu().getIc());
     }
 
     // R1 == R2
     @Test
-    void testJEW_3() {
+    void testJEW_3() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -693,13 +809,15 @@ class EmulatorTest {
         emulator.getCpu().setR2(0x02);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     @Test
-    void testOR0() {
+    void testOR0() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -710,13 +828,15 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0x22);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x33, emulator.getCpu().getR0());
     }
 
     @Test
-    void testAN0() {
+    void testAN0() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -727,14 +847,16 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0x33);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01, emulator.getCpu().getR0());
     }
 
     // R0 gleich dem nachfolgenden Byte
     @Test
-    void testJE0_1() {
+    void testJE0_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -746,14 +868,16 @@ class EmulatorTest {
         emulator.getCpu().setR0(0xCC);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < 1; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01FF, emulator.getCpu().getIc());
     }
 
     // R0 ungleich dem nachfolgenden Byte
     @Test
-    void testJE0_2() {
+    void testJE0_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -765,14 +889,16 @@ class EmulatorTest {
         emulator.getCpu().setR0(0xEE);
         emulator.getCpu().setAr(0x01FF);
 
-        emulator.run();
+        for(int i = 0; i < 1; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x0102, emulator.getCpu().getIc());
     }
 
     // R0 ungleich dem nachfolgenden Byte
     @Test
-    void testC01() {
+    void testC01() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -783,14 +909,16 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0xFE);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFE, emulator.getCpu().getR1());
     }
 
     // R0 ungleich dem nachfolgenden Byte
     @Test
-    void testC02() {
+    void testC02() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -801,14 +929,16 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0xFE);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFE, emulator.getCpu().getR2());
     }
 
     // Kein Übelauf von r1, kein Übelauf von r2
     @Test
-    void testIRW_1() {
+    void testIRW_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -820,7 +950,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x00);
         emulator.getCpu().setR2(0x00);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01, emulator.getCpu().getR1());
         assertEquals(0x00, emulator.getCpu().getR2());
@@ -828,7 +960,7 @@ class EmulatorTest {
 
     // Übelauf von r1, kein Übelauf von r2
     @Test
-    void testIRW_2() {
+    void testIRW_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -840,7 +972,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0xFF);
         emulator.getCpu().setR2(0x00);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFF, emulator.getCpu().getR1());
         assertEquals(0x01, emulator.getCpu().getR2());
@@ -848,7 +982,7 @@ class EmulatorTest {
 
     // Übelauf von r1, übelauf von r2
     @Test
-    void testIRW_3() {
+    void testIRW_3() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -860,7 +994,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0xFF);
         emulator.getCpu().setR2(0xFF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFF, emulator.getCpu().getR1());
         assertEquals(0xFF, emulator.getCpu().getR2());
@@ -868,7 +1004,7 @@ class EmulatorTest {
 
     // Kein negatives Ergebnis, Kein Unterlauf von r2
     @Test
-    void testDRW_1() {
+    void testDRW_1() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -880,7 +1016,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x02);
         emulator.getCpu().setR2(0x02);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01, emulator.getCpu().getR1());
         assertEquals(0x02, emulator.getCpu().getR2());
@@ -888,7 +1026,7 @@ class EmulatorTest {
 
     // negatives Ergebnis, Kein Unterlauf von r2
     @Test
-    void testDRW_2() {
+    void testDRW_2() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -900,7 +1038,9 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x00);
         emulator.getCpu().setR2(0x02);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01, emulator.getCpu().getR1());
         assertEquals(0x01, emulator.getCpu().getR2());
@@ -908,7 +1048,7 @@ class EmulatorTest {
 
     // negatives Ergebnis, Unterlauf von r2
     @Test
-    void testDRW_3() {
+    void testDRW_3() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -920,14 +1060,16 @@ class EmulatorTest {
         emulator.getCpu().setR1(0x00);
         emulator.getCpu().setR2(0x00);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x00, emulator.getCpu().getR1());
         assertEquals(0x00, emulator.getCpu().getR2());
     }
 
     @Test
-    void testX03() {
+    void testX03() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -939,14 +1081,16 @@ class EmulatorTest {
         emulator.getCpu().setR0(0xAA);
         emulator.getCpu().setR3(0xFF);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xFF, emulator.getCpu().getR0());
         assertEquals(0xAA, emulator.getCpu().getR3());
     }
 
     @Test
-    void testC03() {
+    void testC03() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -957,13 +1101,15 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0xAA);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xAA, emulator.getCpu().getR3());
     }
 
     @Test
-    void testC30() {
+    void testC30() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -974,13 +1120,15 @@ class EmulatorTest {
 
         emulator.getCpu().setR3(0xAA);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0xAA, emulator.getCpu().getR0());
     }
 
     @Test
-    void testPL0() {
+    void testPL0() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -991,13 +1139,15 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0x01);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x02, emulator.getCpu().getR0());
     }
 
     @Test
-    void testPR0() {
+    void testPR0() throws InterruptedException {
         Emulator emulator = new Emulator();
 
         int[] program = {
@@ -1008,7 +1158,9 @@ class EmulatorTest {
 
         emulator.getCpu().setR0(0x02);
 
-        emulator.run();
+        for(int i = 0; i < program.length; i++){
+            emulator.getCpu().clock();
+        }
 
         assertEquals(0x01, emulator.getCpu().getR0());
     }

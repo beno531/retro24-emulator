@@ -11,13 +11,15 @@ public class CPU {
     private int r2 = 0x00;
     private int r3 = 0x00;
 
+    private boolean hlt = false;
+
     private boolean running;
 
     private Memory memory;
     private Map<Integer, Runnable> opcodeMap = new HashMap<>();
 
     public CPU() {
-        memory = Memory.getInstance();
+        //memory = Memory.getInstance();
         running = true;
 
         opcodeMap.put(0x00, this::nul); // NUL ($00, 1-Byte-OP): Prozessor tut nichts
@@ -57,25 +59,19 @@ public class CPU {
         opcodeMap.put(0xFF, this::hlt); // HLT ($FF, 1-Byte-OP): Prozessor hält an
     }
 
-    public void startup() {
+    public void clock() {
 
-        while(running){
+        int opcode = memory.read(ic);
 
-            int opcode = memory.read(ic);
+        debugOut(opcode);
 
-            debugOut(opcode);
+        Runnable instruction = opcodeMap.get(opcode);
 
-            Runnable instruction = opcodeMap.get(opcode);
-
-            if (instruction != null) {
-                instruction.run();
-            } else {
-                throw new IllegalStateException("Unbekannter Opcode: " + opcode);
-            }
+        if (instruction != null) {
+            instruction.run();
+        } else {
+            throw new IllegalStateException("Unbekannter Opcode: " + opcode);
         }
-
-        System.out.print("----------------------------------------- \n");
-        System.out.print("Prozessor angehalten \n");
 
     }
 
@@ -148,18 +144,36 @@ public class CPU {
         this.r3 = (r3 & 0xFF);;
     }
 
+    public boolean getHlt() {
+        return hlt;
+    }
+
+    public void setHlt(boolean hlt) {
+        this.hlt = hlt;
+    }
+
+    // --- Helper ---
+
+    public void incrAr(int i){
+        ar = (ar + i) & 0xFFFF;
+    }
+
+    public void incrIc(int i){
+        ic = (ic + i) & 0xFFFF;
+    }
+
     // --- Instructions ---
 
     // Prozessor tut nichts
     private void nul(){
-        ++ic;
+        incrIc(1);
     }
 
     // Lädt AR mit den nächsten beiden Bytes.
     private void mar(){
         // little endian
         ar = ((memory.read(ic + 2) & 0xFF) << 8) | (memory.read(ic + 1) & 0xFF);
-        ic += 3;
+        incrIc(3);
     }
 
     // Speichert IC an die im AR angegebene Adresse.
@@ -167,26 +181,26 @@ public class CPU {
         int lowByte = ic & 0xFF;
         int highByte = (ic >> 8) & 0xFF;
         memory.write(ar, lowByte);
-        memory.write(ar + 1, highByte);
-        ic += 1;
+        memory.write((ar + 1) & 0xFFFF, highByte);
+        incrIc(1);
     }
 
     // R1/R2 werden ins AR kopiert.
     private void rar(){
         ar = ((r2) << 8) | (r1);
-        ++ic;
+        incrIc(1);
     }
 
     // Addiert (Bitweise) R0 aufs AR, bei Überlauf geht Übertrag verloren.
     private void aar(){
-        ar = Math.min(ar + r0, 0xFFFF);
-        ++ic;
+        ar = (ar + r0) & 0xFFFF;
+        incrIc(1);
     }
 
     // Erhöht den Wert von R0 um 1, allerdings nicht über $FF hinaus.
     private void ir0() {
         r0 = Math.min(r0 + 1, 0xFF);
-        ++ic;
+        incrIc(1);
     }
 
     // Addiert R0 auf R1. Bei Überlauf wird R2 um 1 erhöht. Läuft dabei wiederum R2 über, werden R1 und R2 zu $FF.
@@ -199,13 +213,13 @@ public class CPU {
         else {
             r1 = x;
         }
-        ++ic;
+        incrIc(1);
     }
 
     // Erniedrigt den Wert von R0 um 1, allerdings nicht unter $00.
     private void dr0(){
         r0 = Math.max(r0 - 1, 0x00);
-        ++ic;
+        incrIc(1);
     }
 
     // Subtrahiert R0 von R1. Falls eine negative Zahl entsteht, enthält R1 dann den Betrag der negativen Zahl. Ferner wird dann R2 um 1 erniedrigt. Tritt dabei ein Unterlauf von R2 auf, werden R1 und R2 zu $00.
@@ -225,7 +239,7 @@ public class CPU {
         } else {
             r1 = x;
         }
-        ++ic;
+        incrIc(1);
     }
 
     // Vertauscht die Inhalte von R1 und R2.
@@ -233,7 +247,7 @@ public class CPU {
         int temp = r1;
         r1 = r2;
         r2 = temp;
-        ++ic;
+        incrIc(1);
     }
 
     // Vertauscht die Inhalte von R0 und R1.
@@ -241,7 +255,7 @@ public class CPU {
         int temp = r0;
         r0 = r1;
         r1 = temp;
-        ++ic;
+        incrIc(1);
     }
 
     // Springt zu der in AR angegebenen Adresse.
@@ -252,27 +266,27 @@ public class CPU {
     // Speichert R0 an die in AR angegebene Adresse.
     private void sr0(){
         memory.write(ar, r0);
-        ++ic;
+        incrIc(1);
     }
 
     // Speichert R1 an die in AR angegebene Adresse, ferner R2 an die Adresse dahinter.
     private void srw(){
         memory.write(ar, r1);
         memory.write(ar + 1, r2);
-        ++ic;
+        incrIc(1);
     }
 
     // Lädt R0 aus der in AR angegebenen Adresse.
     private void lr0(){
         r0 = memory.read(ar);
-        ++ic;
+        incrIc(1);
     }
 
     // Lädt R1 aus der in AR angegebenen Adresse, ferner R2 aus der Adresse dahinter.
     private void lrw(){
         r1 = memory.read(ar);
         r2 = memory.read(ar + 1);
-        ++ic;
+        incrIc(1);
     }
 
     // AR wird nach R1/R2 kopiert.
@@ -281,20 +295,20 @@ public class CPU {
         int highByte = (ar >> 8) & 0xFF;
         r1 = lowByte;
         r2 = highByte;
-        ++ic;
+        incrIc(1);
     }
 
     // Das nachfolgende Byte wird nach R0 geschrieben.
     private void mr0(){
         r0 = memory.read(ic + 1);
-        ic += 2;
+        incrIc(2);
     }
 
     // Die nachfolgenden 2 Bytes werden nach R1 und R2 geschrieben.
     private void mrw(){
         r1 = memory.read(ic + 1);
         r2 = memory.read(ic + 2);
-        ic += 3;
+        incrIc(3);
     }
 
     // Springt zu der in AR angegebenen Adresse, falls R0=$00 ist.
@@ -303,7 +317,7 @@ public class CPU {
             ic = ar;
         }
         else {
-            ++ic;
+            incrIc(1);
         }
     }
 
@@ -313,7 +327,7 @@ public class CPU {
             ic = ar;
         }
         else {
-            ++ic;
+            incrIc(1);
         }
     }
 
@@ -323,20 +337,20 @@ public class CPU {
             ic = ar;
         }
         else {
-            ++ic;
+            incrIc(1);
         }
     }
 
     // Speichert in R0 das logische ODER aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
     private void or0(){
         r0 = (r0 | memory.read(ic + 1)) & 0xFF;
-        ic += 2;
+        incrIc(2);
     }
 
     // Speichert in R0 das logische UND aus dem aktuellen Wert von R0 und dem nachfolgenden Byte.
     private void an0(){
         r0 = (r0 & memory.read(ic + 1)) & 0xFF;
-        ic += 2;
+        incrIc(2);
     }
 
     // Springt zu der in AR angegebenen Adresse, falls R0 gleich dem nachfolgenden Byte ist.
@@ -346,20 +360,20 @@ public class CPU {
             ic = ar;
         }
         else {
-            ic += 2;
+            incrIc(2);
         }
     }
 
     // Kopiert R0 nach R1.
     private void c01(){
         r1 = r0;
-        ++ic;
+        incrIc(1);
     }
 
     // Kopiert R0 nach R2.
     private void c02(){
         r2 = r0;
-        ++ic;
+        incrIc(1);
     }
 
     // Erhöht den Wert von R1 um 1. Bei Überlauf wird R2 um 1 erhöht. Läuft dabei wiederum R2 über, werden R1 und R2 zu $FF.
@@ -372,7 +386,7 @@ public class CPU {
         else {
             r1 = x;
         }
-        ++ic;
+        incrIc(1);
     }
 
     // Erniedrigt den Wert von R1 um 1. Falls eine negative Zahl entsteht, enthält R1 dann den Betrag der negativen Zahl. Ferner wird dann R2 um 1 erniedrigt. Tritt dabei ein Unterlauf von R2 auf, werden R1 und R2 zu $00.
@@ -392,7 +406,7 @@ public class CPU {
         } else {
             r1 = x;
         }
-        ++ic;
+        incrIc(1);
     }
 
     // Vertauscht die Inhalte von R0 und R3.
@@ -400,36 +414,36 @@ public class CPU {
         int temp = r0;
         r0 = r3;
         r3 = temp;
-        ++ic;
+        incrIc(1);
     }
 
     // Kopiert R0 nach R3.
     private void c03(){
         r3 = r0;
-        ++ic;
+        incrIc(1);
     }
 
     // Kopiert R3 nach R0.
     private void c30(){
         r0 = r3;
-        ++ic;
+        incrIc(1);
     }
 
     // Schiebt die Bits in R0 um ein Bit nach „links“
     private void pl0(){
         r0 = (r0 << 1);
-        ++ic;
+        incrIc(1);
     }
 
     // Schiebt die Bits in R0 um ein Bit nach „rechts“
     private void pr0(){
         r0 = (r0 >> 1);
-        ++ic;
+        incrIc(1);
     }
 
     // Prozessor hält an
     private void hlt(){
-        running = false;
+        hlt = true;
+        incrIc(1);
     }
-
 }
